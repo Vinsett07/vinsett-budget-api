@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: VINSETT Budget API
+  version: 1.0.0
+  description: Voice-enabled budget management API using Spring AI and Tool Calling.
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/assistant/text:
+    post:
+      summary: Process a text command
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200': { description: Command processed }
+  /api/v1/assistant/voice:
+    post:
+      summary: Process a voice command
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                includeAudio: { type: boolean, default: true }
+      responses:
+        '200': { description: Voice command processed }
+  /api/v1/assistant/commands/{id}:
+    get:
+      summary: Get command execution
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Command details }
+  /api/v1/assistant/commands/{id}/speech:
+    post:
+      summary: Generate MP3 for a stored command response
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: MPEG audio
+          content:
+            audio/mpeg: {}
+  /api/v1/audio/transcriptions:
+    post:
+      summary: Transcribe audio
+      responses:
+        '200': { description: Transcription result }
+  /api/v1/audio/speech:
+    post:
+      summary: Synthesize text to MP3
+      responses:
+        '200':
+          description: MPEG audio
+          content:
+            audio/mpeg: {}
+  /api/v1/entries:
+    get:
+      summary: List ledger entries
+      responses:
+        '200': { description: Entry page }
+    post:
+      summary: Create a ledger entry
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200': { description: Entry created }
+  /api/v1/entries/{id}:
+    get:
+      summary: Get a ledger entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Entry }
+  /api/v1/summary:
+    get:
+      summary: Get monthly financial summary
+      responses:
+        '200': { description: Monthly summary }
+  /api/v1/budgets/{month}/{category}:
+    put:
+      summary: Set or replace a monthly category budget
+      parameters:
+        - name: month
+          in: path
+          required: true
+          schema: { type: string, example: '2026-09' }
+        - name: category
+          in: path
+          required: true
+          schema: { type: string, example: FOOD }
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200': { description: Budget updated }
+components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
