@@ -1,0 +1,54 @@
+
+@baseUrl = http://localhost:8080
+@token = PASTE_YOUR_APP_API_TOKEN
+
+### Saúde
+GET {{baseUrl}}/actuator/health
+
+### Comando textual. Use uma UUID diferente para cada NOVO comando.
+POST {{baseUrl}}/api/v1/assistant/text
+Authorization: Bearer {{token}}
+Idempotency-Key: a4315e04-4797-4bfe-ab94-777ab38d98a1
+Content-Type: application/json
+
+{
+  "text": "Registre uma despesa de 42,90 reais com almoço em 27/09/2026.",
+  "includeAudio": true
+}
+
+### Lançamento determinístico via REST, sem modelo de IA.
+POST {{baseUrl}}/api/v1/entries
+Authorization: Bearer {{token}}
+Idempotency-Key: 31aec57f-df92-4a69-b7f9-3b600f8e23f8
+Content-Type: application/json
+
+{
+  "type": "INCOME",
+  "category": "SALARY",
+  "amount": 3500.00,
+  "description": "Salário de setembro",
+  "occurredOn": "2026-09-05"
+}
+
+### Limite mensal por categoria
+PUT {{baseUrl}}/api/v1/budgets/2026-09/FOOD
+Authorization: Bearer {{token}}
+Idempotency-Key: 35e82e9b-29c1-4434-967d-2f833e7a1f05
+Content-Type: application/json
+
+{"amount": 700.00}
+
+### Resumo e limites
+GET {{baseUrl}}/api/v1/summary?month=2026-09
+Authorization: Bearer {{token}}
+
+### Lista paginada
+GET {{baseUrl}}/api/v1/entries?month=2026-09&page=0&size=20
+Authorization: Bearer {{token}}
+
+### Síntese avulsa; resposta binária audio/mpeg
+POST {{baseUrl}}/api/v1/audio/speech
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"text": "Esta voz foi gerada por inteligência artificial."}
