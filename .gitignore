@@ -1,0 +1,17 @@
+# Build
+target/
+
+# Local runtime data
+data/
+*.mv.db
+*.trace.db
+
+# Environment/secrets
+.env
+
+# IDE/OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
