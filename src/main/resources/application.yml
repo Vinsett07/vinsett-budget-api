@@ -1,0 +1,67 @@
+
+spring:
+  application:
+    name: vinsett-budget-api
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/budget;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+      file-size-threshold: 1MB
+  ai:
+    model:
+      embedding: none
+      image: none
+      moderation: none
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      timeout: 45s
+      max-retries: 0
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4.1-mini}
+          temperature: 0.1
+          max-completion-tokens: 900
+          parallel-tool-calls: false
+      audio:
+        transcription:
+          model: ${OPENAI_TRANSCRIPTION_MODEL:gpt-4o-mini-transcribe}
+          response-format: json
+          language: pt
+        speech:
+          model: ${OPENAI_TTS_MODEL:gpt-4o-mini-tts}
+          voice: ${OPENAI_TTS_VOICE:alloy}
+          response-format: mp3
+          speed: 1.0
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+app:
+  api-token: ${APP_API_TOKEN}
+  account-id: ${APP_ACCOUNT_ID:79d2a37e-8ec3-4231-97cb-47160c28e103}
+  zone: ${APP_ZONE:America/Manaus}
+  max-concurrent-ai-requests: 4
